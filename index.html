@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,55 +6,82 @@
     <title>Daily Weather</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f0f8ff;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            transition: background 0.8s ease;
         }
         .container {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             padding: 30px;
             text-align: center;
             width: 90%;
             max-width: 400px;
+            color: white;
         }
         h1 {
-            color: #333;
+            color: white;
             margin-bottom: 20px;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         #weather-info {
             margin-top: 20px;
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .weather-item {
             margin: 10px 0;
             font-size: 18px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .temperature {
-            font-size: 36px;
+            font-size: 64px;
             font-weight: bold;
-            color: #ff6b35;
+            color: white;
+            margin: 10px 0;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .description {
             text-transform: capitalize;
             margin: 10px 0;
+            font-size: 22px;
+            font-weight: 400;
         }
         .error {
-            color: red;
+            color: #ffcccc;
             margin-top: 20px;
+            font-weight: bold;
         }
         .loading {
-            color: #666;
+            color: white;
             font-style: italic;
+            margin-bottom: 20px;
         }
         #location {
-            font-weight: bold;
+            font-weight: 500;
             margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        #weather-icon {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
         }
     </style>
 </head>
@@ -64,6 +91,7 @@
         <div id="location">Detecting location...</div>
         <div class="loading">Loading weather data...</div>
         <div id="weather-info">
+            <img id="weather-icon" src="" alt="Weather Icon">
             <div class="temperature" id="temperature">--°C</div>
             <div class="description" id="description">--</div>
             <div class="weather-item">Humidity: <span id="humidity">--%</span></div>
@@ -73,7 +101,7 @@
     </div>
 
     <script>
-        const API_KEY = '62b975314b57020b17b6dad18f91427e'; // Replace with your OpenWeatherMap API key
+        const API_KEY = '62b975314b57020b17b6dad18f91427e';
         const locationDiv = document.getElementById('location');
         const loadingDiv = document.querySelector('.loading');
         const weatherInfoDiv = document.getElementById('weather-info');
@@ -82,8 +110,22 @@
         const descriptionDiv = document.getElementById('description');
         const humidityDiv = document.getElementById('humidity');
         const windSpeedDiv = document.getElementById('wind-speed');
+        const weatherIcon = document.getElementById('weather-icon');
 
-        // Get user's location using Geolocation API
+        const weatherBackgrounds = {
+            'Clear': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'Clouds': 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)',
+            'Rain': 'linear-gradient(135deg, #485563 0%, #29323c 100%)',
+            'Drizzle': 'linear-gradient(135deg, #485563 0%, #29323c 100%)',
+            'Thunderstorm': 'linear-gradient(135deg, #0f0c29 0%, #24243e 100%)',
+            'Snow': 'linear-gradient(135deg, #e6e9f0 0%, #eef1f5 100%)',
+            'Mist': 'linear-gradient(135deg, #757f9a 0%, #d7dde8 100%)',
+            'Smoke': 'linear-gradient(135deg, #757f9a 0%, #d7dde8 100%)',
+            'Haze': 'linear-gradient(135deg, #757f9a 0%, #d7dde8 100%)',
+            'Dust': 'linear-gradient(135deg, #757f9a 0%, #d7dde8 100%)',
+            'Fog': 'linear-gradient(135deg, #757f9a 0%, #d7dde8 100%)'
+        };
+
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -104,7 +146,6 @@
             }
         }
 
-        // Fetch weather data from OpenWeatherMap API
         async function fetchWeather(lat, lon) {
             try {
                 const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
@@ -122,23 +163,29 @@
             }
         }
 
-        // Display weather data
         function displayWeather(data) {
             loadingDiv.style.display = 'none';
             weatherInfoDiv.style.display = 'block';
 
             temperatureDiv.textContent = `${Math.round(data.main.temp)}°C`;
             descriptionDiv.textContent = data.weather[0].description;
-            humidityDiv.textContent = data.main.humidity;
-            windSpeedDiv.textContent = data.wind.speed;
+            humidityDiv.textContent = `${data.main.humidity}%`;
+            windSpeedDiv.textContent = `${data.wind.speed} m/s`;
 
-            // Update location with city name if available
+            // Weather Icon
+            weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
+            // Dynamic Background
+            const mainCondition = data.weather[0].main;
+            if (weatherBackgrounds[mainCondition]) {
+                document.body.style.background = weatherBackgrounds[mainCondition];
+            }
+
             if (data.name) {
                 locationDiv.textContent = `Location: ${data.name}`;
             }
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', getLocation);
     </script>
 </body>
