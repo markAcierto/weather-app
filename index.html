@@ -83,6 +83,10 @@
             height: 120px;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
         }
+        #feels-like {
+            opacity: 0.9;
+            font-weight: 400;
+        }
     </style>
 </head>
 <body>
@@ -96,6 +100,7 @@
             <div class="description" id="description">--</div>
             <div class="weather-item">Humidity: <span id="humidity">--%</span></div>
             <div class="weather-item">Wind Speed: <span id="wind-speed">-- m/s</span></div>
+            <div class="weather-item">Feels Like: <span id="feels-like">--°C</span></div>
         </div>
         <div id="error-message" class="error"></div>
     </div>
@@ -110,6 +115,7 @@
         const descriptionDiv = document.getElementById('description');
         const humidityDiv = document.getElementById('humidity');
         const windSpeedDiv = document.getElementById('wind-speed');
+        const feelsLikeDiv = document.getElementById('feels-like');
         const weatherIcon = document.getElementById('weather-icon');
 
         const weatherBackgrounds = {
@@ -171,6 +177,7 @@
             descriptionDiv.textContent = data.weather[0].description;
             humidityDiv.textContent = `${data.main.humidity}%`;
             windSpeedDiv.textContent = `${data.wind.speed} m/s`;
+            feelsLikeDiv.textContent = `${Math.round(data.main.feels_like)}°C`;
 
             // Weather Icon
             weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
