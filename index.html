@@ -9,7 +9,7 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #f0f0f5 0%, #e0e0e5 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -195,6 +195,27 @@
         }
 
         document.addEventListener('DOMContentLoaded', getLocation);
+        // Light/Dark mode toggle
+        let darkMode = false;
+        const themeToggle = document.getElementById('theme-toggle');
+        function toggleTheme() {
+            darkMode = !darkMode;
+            const body = document.body;
+            const container = document.querySelector('.container');
+            if (darkMode) {
+                body.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+                container.style.color = 'white';
+                container.style.background = 'rgba(255,255,255,0.2)';
+                themeToggle.textContent = 'Light Mode';
+            } else {
+                body.style.background = 'linear-gradient(135deg, #f0f0f5 0%, #e0e0e5 100%)';
+                container.style.color = 'black';
+                container.style.background = 'rgba(255,255,255,0.8)';
+                themeToggle.textContent = 'Dark Mode';
+            }
+        }
+        themeToggle.addEventListener('click', toggleTheme);
+        
     </script>
 </body>
 </html>
